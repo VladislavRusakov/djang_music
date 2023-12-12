@@ -1,0 +1,42 @@
+{% load static %}
+{% csrf_token %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="{% static 'css/index.css' %}" rel="stylesheet">
+</head>
+
+<body>
+{% if playlist %}
+Playlist {{ playlist }}:
+    {% for playlist_object in playliststack %}
+    <div class="song--element">
+        <image class="song--pic" src="{% static 'no_img.png' %}"></image>
+        <div class="song--text">
+            <div>{{ playlist_object.song_id.artist }} -</div>
+            <div>{{ playlist_object.song_id }} </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+
+    {% if queue %}
+        Queue:
+        {% for queue_object in queue %}
+            <div class="song--element">
+                <image class="song--pic" src="{% static 'no_img.png' %}"></image>
+                <div class="song--text">
+                    <div>{{ queue_object.song_id.artist }} -</div>
+                    <div>{{ queue_object.song_id }} </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        The request queue is empty
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,30 @@
+{% load static %}
+{% csrf_token %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="{% static 'css/index.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    List of all songs:
+    {% for song in songs %}
+    <div class="song--element">
+        <image class="song--pic" src="{% static '/no_img.png' %}"></image>
+        <div class="song--text">
+            <div>{{ song.title }}</div>
+            <div>{{ song.artist }}</div>
+        </div>
+        <form class="song--request--form" action="/request" method="post">
+            {% csrf_token %}
+            <input class="song--name--hidden" name="song" value="{{ song.id }}">
+            <button type = "submit" class="song--request--button">+</button>
+        </form>
+    </div>
+    {% endfor %}
+</body>
+</html>
