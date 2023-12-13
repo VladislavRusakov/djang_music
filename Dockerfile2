@@ -1,0 +1,21 @@
+FROM 10.15.15.56:8083/icecast
+#   FROM 10.15.15.56:8083/python:3.10
+USER root
+RUN apt-get update; apt-get install python3.10  libshout3 libshout3-dev bash pip vim \
+-y  && apt-get clean 
+#python3-django python3-pygame python3-mutagen \
+
+
+COPY req2.txt req.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r req.txt
+
+COPY . code
+WORKDIR /code
+EXPOSE 8000
+VOLUME ["/code"]
+
+#USER icecast
+
+ENTRYPOINT ["python3", "manage.py"]
+#ENTRYPOINT ["bash", "-c"]
+CMD ["runserver", "0.0.0.0:8000"]
