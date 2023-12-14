@@ -15,11 +15,12 @@ def icecast_connect():
     """Connecting to icecast server
     using credentials below"""
     shoutobj = shout.Shout()
-    shoutobj.host = '10.15.15.57'
+    shoutobj.host = '127.0.0.1'
+    #shoutobj.host = '10.15.15.57'
     shoutobj.port = 8000
     shoutobj.user = 'source'
     shoutobj.password = 'ChangeMe'
-    shoutobj.mount = "/spaces"
+    shoutobj.mount = "/stream"
     shoutobj.format ='mp3'
     shoutobj.open()
 

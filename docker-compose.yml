@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  icecast:
+    restart: unless-stopped
+    #container_name: icecast
+    image: icecast:temp
+    ports:
+      - "18000:8000"
+      - "18100:8100"
+    volumes:
+      #s- ./db.sqlite3:/code/db.sqlite3
+      - /home/workspace/djang_music/:/code
+      #- ./icecast.xml:/code/icecast.xml
+    environment:
+      - ICECAST_ADMIN_PASSWORD=snowman1!
+      - ICECAST_ADMIN_USERNAME=snowman
+      - ICECAST_SOURCE_PASSWORD=ChangeMe
+      - ICECAST_LOCATION=smartColumn
+
+# volumes:
+#   icecast-tmp:
+

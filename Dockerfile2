@@ -3,19 +3,30 @@ FROM 10.15.15.56:8083/icecast
 USER root
 RUN apt-get update; apt-get install python3.10  libshout3 libshout3-dev bash pip vim \
 -y  && apt-get clean 
-#python3-django python3-pygame python3-mutagen \
 
+# Set the root password
+RUN echo 'root:iceroot' | chpasswd 
 
 COPY req2.txt req.txt
 RUN pip install --upgrade pip && pip install --no-cache-dir -r req.txt
 
 COPY . code
+COPY entry-cmd.sh /entry-cmd.sh
+
 WORKDIR /code
+
+EXPOSE 8100
 EXPOSE 8000
 VOLUME ["/code"]
 
-#USER icecast
+RUN mkdir -p  /usr/share/icecast/{spaces,stream} \
+&& chown -R icecast:icecast /usr/share/icecast \
+&& chown -R icecast:icecast /code
+#USER icecast 
+#fix django db
 
-ENTRYPOINT ["python3", "manage.py"]
+ENTRYPOINT ["/entry-cmd.sh"]
 #ENTRYPOINT ["bash", "-c"]
-CMD ["runserver", "0.0.0.0:8000"]
+#CMD ["runserver", "0.0.0.0:8100"]
+
+# docker run     -p 18000:8000 -p 18100:8100 icecast:temp
