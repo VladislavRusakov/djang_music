@@ -22,7 +22,7 @@
         <form class="song--request--form" action="/request" method="post">
             {% csrf_token %}
             <input class="song--name--hidden" name="song" value="{{ song.id }}">
-            <button type = "submit" class="song--request--button">+</button>
+            <button type="submit" class="song--request--button">+</button>
         </form>
     </div>
     {% endfor %}

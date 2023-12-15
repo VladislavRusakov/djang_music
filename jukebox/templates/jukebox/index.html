@@ -38,5 +38,11 @@ Playlist {{ playlist }}:
     {% else %}
         The request queue is empty
     {% endif %}
+
+    <form class="start--stream--form" action="/startstream" method="post">
+        {% csrf_token %}
+        <!-- <input class="song--name--hidden" name="song" value="{{ song.id }}"> -->
+        <button type="submit" class="start--stream--button">Play</button>
+    </form>
 </body>
 </html>

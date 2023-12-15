@@ -1,3 +1,4 @@
+from itertools import cycle
 import random
 import time
 import os
@@ -110,31 +111,44 @@ def stream_song(song_path) -> None:
 
 def stream_playlist_view(request):
     """Launches a playlist stream"""
-    playlist_name = 'friday_night'
-    playliststack = models.PlaylistStack.objects.all().select_related('playlist_id', 'song_id').filter(playlist_id__name=playlist_name)
+    if request.method == 'POST':
+        playlist_name = 'friday_night'
+        playliststack = models.PlaylistStack.objects.all().select_related('playlist_id', 'song_id').filter(playlist_id__name=playlist_name)
 
-    song_stack = []
-    for song in playliststack:
-        file = f"media/{song.song_id.audio_file}"
-        song_stack.append(file)
-    stream_playlist(song_stack)
-
-    return redirect('')
+        song_stack = []
+        for song in playliststack:
+            file = f"media/{song.song_id.audio_file}"
+            song_stack.append(file)
+        stream_playlist(song_stack)
 
 
-def stream_playlist(playlist: list) -> None:
+def stream_playlist(playlist: list, runs=1) -> None:
     """Gets a list of songs paths
     and streams them in a cycle"""
-    for path in playlist:
-        oldest_request = models.Queue.objects.first()
+    def looper(playlist, runs):
+        path = cycle(playlist)
+        for _ in range(runs):
+            oldest_request = models.Queue.objects.first()
 
-        if not oldest_request:
-            stream_song(path)
-        else:
-            path = f'''media/{oldest_request.song_id.audio_file}'''
-            stream_song(path)
+            if not oldest_request:
+                stream_song(next(path))
+            else:
+                request_path = f'''media/{oldest_request.song_id.audio_file}'''
+                stream_song(request_path)
 
-            models.Queue.objects.filter(song_id=oldest_request.song_id).delete()
+                models.Queue.objects.filter(song_id=oldest_request.song_id).delete()
+
+    # for path in playlist:
+    #     oldest_request = models.Queue.objects.first()
+
+    #     if not oldest_request:
+    #         stream_song(path)
+    #     else:
+    #         path = f'''media/{oldest_request.song_id.audio_file}'''
+    #         stream_song(path)
+
+    #         models.Queue.objects.filter(song_id=oldest_request.song_id).delete()
+    looper(playlist, runs)
 
     return redirect('')
 
