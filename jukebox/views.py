@@ -150,7 +150,7 @@ def stream_playlist(playlist: list, runs=1) -> None:
     #         models.Queue.objects.filter(song_id=oldest_request.song_id).delete()
     looper(playlist, runs)
 
-    return redirect('')
+    # return redirect('')
 
 
 def song_list_view(request):

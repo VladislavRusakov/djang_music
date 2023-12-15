@@ -2,11 +2,10 @@
 *.log
 *.pot
 *.pyc
-__pycache__
+**/__pycache__
 db.sqlite3
 media
-
-# Backup files # 
+ 
 *.bak 
 
 # If you are using PyCharm # 
@@ -138,4 +137,3 @@ GitHub.sublime-settings
 .history
 
 sys_player.py
-music/__pycache__/
