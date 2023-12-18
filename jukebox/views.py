@@ -1,3 +1,4 @@
+from itertools import cycle
 import random
 import time
 import os
@@ -15,7 +16,7 @@ def icecast_connect():
     """Connecting to icecast server
     using credentials below"""
     shoutobj = shout.Shout()
-    shoutobj.host = '127.0.0.1'
+    shoutobj.host = '10.15.15.57'
     #shoutobj.host = '10.15.15.57'
     shoutobj.port = 8000
     shoutobj.user = 'source'
@@ -65,7 +66,7 @@ def play_playlist_view(request):
         song_stack.append(file)
     run_playlist(song_stack)
 
-    return redirect('')
+    return redirect('index')
 
 
 def run_playlist(playlist: list) -> None:
@@ -109,35 +110,52 @@ def stream_song(song_path) -> None:
     shoutobj.close()
 
 
-def stream_playlist_view(request):
-    """Launches a playlist stream"""
-    playlist_name = 'friday_night'
-    playliststack = models.PlaylistStack.objects.all().select_related('playlist_id', 'song_id').filter(playlist_id__name=playlist_name)
+def stream_playlist_view(request, shuffle: bool = False):
+    """Launches a playlist stream. Has a shuffle option"""
+    if request.method == 'POST':
+        playlist_name = 'friday_night'
+        playliststack = models.PlaylistStack.objects.all().select_related('playlist_id', 'song_id').filter(playlist_id__name=playlist_name)
 
-    song_stack = []
-    for song in playliststack:
-        file = f"media/{song.song_id.audio_file}"
-        song_stack.append(file)
-    stream_playlist(song_stack)
+        song_stack = []
+        for song in playliststack:
+            file = f"media/{song.song_id.audio_file}"
+            song_stack.append(file)
 
-    return redirect('')
+        if shuffle:
+            random.shuffle(song_stack)
+
+        stream_playlist(song_stack)
+
+    # return redirect('index')
 
 
-def stream_playlist(playlist: list) -> None:
+def stream_playlist(playlist: list, runs=2) -> None:
     """Gets a list of songs paths
     and streams them in a cycle"""
-    for path in playlist:
-        oldest_request = models.Queue.objects.first()
+    def looper(iterable, runs):
+        path = cycle(iterable)
+        playlist_length = len(playlist)
 
-        if not oldest_request:
-            stream_song(path)
-        else:
-            path = f'''media/{oldest_request.song_id.audio_file}'''
-            stream_song(path)
+        for _ in range(runs * playlist_length):
+            oldest_request = models.Queue.objects.first()
 
-            models.Queue.objects.filter(song_id=oldest_request.song_id).delete()
+            if not oldest_request:
+                song = next(path)
+                stream_song(song)
+                print(song)
+            else:
+                """Принято решение удалять песню из очереди как только она начала проигрываться"""
+                models.Queue.objects.filter(song_id=oldest_request.song_id).delete()
+    
+                path = f'''media/{oldest_request.song_id.audio_file}'''
+                stream_song(path)
+                print(path)
 
-    return redirect('')
+                # models.Queue.objects.filter(song_id=oldest_request.song_id).delete()
+
+    looper(playlist, runs)
+
+    # return redirect('')
 
 
 def song_list_view(request):

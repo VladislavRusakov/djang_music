@@ -15,7 +15,11 @@
 Playlist {{ playlist }}:
     {% for playlist_object in playliststack %}
     <div class="song--element">
+        {% if playlist_object.song_id.image %}
+        <image class="song--pic" src="./media/{{ playlist_object.song_id.image }}"></image>
+        {% else %}
         <image class="song--pic" src="{% static 'no_img.png' %}"></image>
+        {% endif %}
         <div class="song--text">
             <div>{{ playlist_object.song_id.artist }} -</div>
             <div>{{ playlist_object.song_id }} </div>
@@ -38,5 +42,9 @@ Playlist {{ playlist }}:
     {% else %}
         The request queue is empty
     {% endif %}
+    <form class="streamstart--request--form" action="/startstream" method="post">
+        {% csrf_token %}
+        <button type = "submit" class="streamstart--request--button">Play</button>
+    </form>
 </body>
 </html>
